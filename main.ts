@@ -1,0 +1,20 @@
+import { cpSync, mkdirSync, writeFileSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildDossier } from './vendor/makefun-app.ts';
+
+// Package the exact static studio and its recorded screenshots, without a build step.
+const sourceRoot = fileURLToPath(new URL('.', import.meta.url));
+const destination = resolve(process.env.MAKEFUN_OUTPUT_DIR || '/output');
+mkdirSync(destination, { recursive: true });
+for (const folder of ['app', 'screenshots']) {
+  cpSync(join(sourceRoot, folder), join(destination, folder), { recursive: true });
+}
+const dossier = buildDossier(destination, {
+  text_max_bytes: 163840,
+  screenshots: { max: 4, max_bytes: 262144 },
+  app_max_files: 993,
+  app_max_bytes: 50331648,
+  app_path_max_bytes: 1000,
+});
+writeFileSync(join(destination, 'dossier.json'), dossier);
