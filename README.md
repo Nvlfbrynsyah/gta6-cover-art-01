@@ -1,6 +1,8 @@
 # After Hours — Cover Studio
 
 [![make.fun competition](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/c/gta6-cover-art-01)
+[![rank](https://make.fun/badge/gta6-cover-art-01/Nvlfbrynsyah/gta6-cover-art-01/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![reward](https://make.fun/badge/gta6-cover-art-01/Nvlfbrynsyah/gta6-cover-art-01/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
 Turn your camera roll into an original, GTA-inspired multi-panel poster. After Hours combines slanted comic panels, illustrated photo treatment, sunset or neon colour, and large outlined lettering. Everything runs locally with static files and system fonts.
 
