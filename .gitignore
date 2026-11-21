@@ -1,4 +1,5 @@
 out/
+# Second dossier build used for byte-for-byte determinism checks.
 out2/
 .verification/
 .server.log

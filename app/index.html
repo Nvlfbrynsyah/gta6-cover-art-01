@@ -12,37 +12,38 @@
   <header class="topbar"><a class="brand" href="./"><span class="mark">A/</span> AFTER HOURS <span class="studio">COVER STUDIO</span></a><div class="top-note"><i></i> LOCAL PHOTOS. LIMITLESS STORIES.</div><span class="edition">VOL. 06 / YOUR CITY, YOUR RULES</span></header>
   <main class="workspace">
     <aside class="controls">
-      <div class="intro"><span class="eyebrow">THE NIGHT IS YOURS</span><h1>Make your<br>main character cover.</h1><p>Your photos. A little neon. A whole new story.</p></div>
+      <div class="intro"><span class="eyebrow">THE SUNSET COLLECTION / 06</span><h1>Your city.<br>Your cover story.</h1><p>Cast the leads. Chase the light. Make it iconic.</p></div>
       <section><div class="section-title"><b>01</b><h2>Set the scene</h2><span>4 layouts</span></div>
         <div id="layouts" class="layouts" aria-label="Panel layout">
-          <button data-layout="collage" class="active" title="Slanted four-panel collage"><span class="layout-icon collage"><i></i><i></i><i></i></span>Collage</button>
+          <button data-layout="collage" class="active" title="Dominant hero with two supporting scenes"><span class="layout-icon collage"><i></i><i></i><i></i></span>Collage</button>
           <button data-layout="hero" title="One hero and two supporting panels"><span class="layout-icon hero"><i></i><i></i><i></i></span>Hero</button>
-          <button data-layout="triptych" title="Three vertical panels"><span class="layout-icon triptych"><i></i><i></i><i></i></span>Triptych</button>
+          <button data-layout="triptych" title="Full-width hero with two inset scenes"><span class="layout-icon triptych"><i></i><i></i><i></i></span>Triptych</button>
           <button data-layout="grid" title="Four panel grid"><span class="layout-icon grid"><i></i><i></i><i></i><i></i></span>Grid</button>
         </div>
       </section>
       <section><div class="section-title"><b>02</b><h2>Cast your story</h2><span id="panel-label">PANEL 01</span></div>
         <div id="panel-tabs" class="panel-tabs" aria-label="Select panel"></div>
         <div class="photo-actions"><label class="upload" tabindex="0">＋ Add your photo<input id="photo" type="file" accept="image/*" hidden multiple></label><button id="fill-all" title="Copy this panel's photo to every panel">Use in all</button></div>
-        <p class="small">Or start with a sample <span class="local">↳ stays on your device</span></p>
+        <p class="small">Choose a panel source <span class="local">↳ entirely offline</span></p>
         <div class="samples"><button data-sample="boulevard"><img src="./samples/boulevard.jpg" alt="Woman beside a red convertible at sunset"><span>Boulevard <small>GOLDEN HOUR</small></span>↗</button><button data-sample="pier"><img src="./samples/pier.jpg" alt="Fisherman beside a turquoise ocean"><span>The pier <small>OCEAN DRIVE</small></span>↗</button></div>
+        <button class="vignette-choice" data-sample="vignette" aria-pressed="false"><span>✦ Vignette</span><small>ORIGINAL VECTOR ART</small></button>
         <label class="range-row">Crop zoom <output id="zoom-value">1.0×</output><input id="zoom" type="range" min="1" max="3" step="0.01" value="1"></label>
         <div class="crop-foot"><span>Drag a panel to reframe · scroll to zoom</span><button id="reset-crop">Reset crop</button></div>
       </section>
       <section><div class="section-title"><b>03</b><h2>Write the headline</h2></div>
         <label class="sr-only" for="caption">Cover caption</label><textarea id="caption" rows="2" maxlength="64" spellcheck="false">VICE\nAFTER HOURS</textarea>
-        <div class="two-col"><label>Type scale<input id="type-size" type="range" min="60" max="145" value="100"></label><label>Vertical position<input id="type-y" type="range" min="20" max="88" value="70"></label></div>
+        <div class="two-col"><label>Type scale<input id="type-size" type="range" min="60" max="145" value="100"></label><label>Vertical position<input id="type-y" type="range" min="20" max="88" value="80"></label></div>
       </section>
       <section><div class="section-title"><b>04</b><h2>Find your colour</h2><span>PER PANEL</span></div>
         <div class="grades"><button data-grade="sunset" class="active"><i class="sunset"></i>Sunset</button><button data-grade="neon"><i class="neon"></i>Neon</button><button data-grade="ocean"><i class="ocean"></i>Ocean</button></div>
-        <label class="range-row">Colour intensity<output id="strength-value">60%</output><input id="strength" type="range" min="0" max="100" value="60"></label>
-        <label class="range-row">Illustration ink<output id="ink-value">55%</output><input id="ink" type="range" min="0" max="100" value="55"></label>
+        <label class="range-row">Colour intensity<output id="strength-value">78%</output><input id="strength" type="range" min="0" max="100" value="78"></label>
+        <label class="range-row">Illustration ink<output id="ink-value">68%</output><input id="ink" type="range" min="0" max="100" value="68"></label>
         <div class="crop-foot"><label class="check"><input id="details" type="checkbox" checked> Poster details</label><button id="grade-all">Apply grade to all</button></div>
       </section>
       <footer>Made for the moments that deserve a cover.<br>Original artwork studio · No uploads · Works offline</footer>
     </aside>
     <section class="preview-area" aria-label="Live cover preview">
-      <div class="preview-toolbar"><div><span class="live-dot"></span> LIVE PREVIEW <span id="dimensions">1080 × 1350</span></div><button id="clear-selection">Hide guides ↗</button></div>
+      <div class="preview-toolbar"><div><span class="live-dot"></span> YOUR COVER <span id="dimensions">1080 × 1350</span></div><button id="clear-selection">Hide guides ↗</button></div>
       <div class="stage"><div class="canvas-wrap"><canvas id="cover" width="1080" height="1350" aria-label="Live multi-panel cover. Select and drag a panel to crop."></canvas><svg id="guides" viewBox="0 0 1080 1350" aria-hidden="true"></svg></div></div>
       <div class="export-bar"><div class="export-caption"><strong>From your camera roll.<br>To the cover.</strong><span>FULL RESOLUTION · PNG · NO WATERMARK</span></div><div class="export-actions"><label class="sr-only" for="size">Export size</label><select id="size"><option value="1080x1350">Portrait · 1080 × 1350</option><option value="1080x1080">Square · 1080 × 1080</option><option value="1920x1080">Wide · 1920 × 1080</option></select><button id="export">Export cover <span>↓</span></button></div></div>
       <p id="status" role="status">Ready when you are. Select any panel to make it yours.</p>

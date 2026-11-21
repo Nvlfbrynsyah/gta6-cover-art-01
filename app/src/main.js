@@ -5,13 +5,21 @@ const canvas = $('cover');
 const ctx = canvas.getContext('2d');
 const query = new URLSearchParams(location.search);
 const state = {
-  layout: 'collage', selected: 0, caption: 'VICE\nAFTER HOURS', typeSize: 100,
-  typeY: 70, details: true, width: 1080, height: 1350,
-  panels: Array.from({length:4}, () => ({image:null, zoom:1, x:.5, y:.5, grade:'sunset', strength:60, ink:55})),
+  layout: 'collage', selected: 0, caption: 'SUNSET\nSYNDICATE', typeSize: 100,
+   typeY: 82, details: true, width: 1080, height: 1350,
+  panels: Array.from({length:4}, (_,i) => ({image:null, vignetteIndex:i, zoom:1, x:.5, y:.5, grade:'sunset', strength:78, ink:68})),
 };
 let guides = true;
 let dragging = null;
 const sampleImages = {};
+const cropPresets = {
+  boulevard: [
+    {zoom:1,x:.52,y:0},{zoom:1,x:.5,y:.5},{zoom:1,x:.5,y:.5},{zoom:1,x:.5,y:.5}
+  ],
+  pier: [
+    {zoom:1.04,x:.52,y:.45},{zoom:1,x:.5,y:.5},{zoom:1,x:.5,y:.5},{zoom:1,x:.5,y:.5}
+  ]
+};
 
 function decodePhoto(source) {
   return new Promise((resolve,reject) => {
@@ -37,6 +45,15 @@ function syncPanelControls() {
   $('zoom-value').value = `${p.zoom.toFixed(1)}×`;
   $('strength-value').value = `${p.strength}%`;
   $('ink-value').value = `${p.ink}%`;
+  const titleBand=state.layout==='collage'&&state.selected===3;
+  $('panel-label').textContent=titleBand?'TITLE BAND':`PANEL 0${state.selected+1}`;
+  $('zoom').disabled=!p.image||titleBand;
+  $('reset-crop').disabled=!p.image||titleBand;
+  document.querySelectorAll('[data-sample]').forEach(b=>{
+    const active=!titleBand&&(b.dataset.sample==='vignette'?!p.image:p.image===sampleImages[b.dataset.sample]);
+    b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));b.disabled=titleBand;
+  });
+  $('fill-all').disabled=titleBand;
   document.querySelectorAll('[data-grade]').forEach(b=>{b.classList.toggle('active',b.dataset.grade===p.grade);b.setAttribute('aria-pressed',String(b.dataset.grade===p.grade));});
   refreshCover();
 }
@@ -51,6 +68,8 @@ function chooseSize(value) {
 }
 
 document.querySelectorAll('[data-layout]').forEach(button=>button.addEventListener('click',()=>{
+  const oldHero=state.layout==='collage'?2:0,newHero=button.dataset.layout==='collage'?2:0;
+  if(oldHero!==newHero)[state.panels[oldHero],state.panels[newHero]]=[state.panels[newHero],state.panels[oldHero]];
   state.layout=button.dataset.layout;
   state.selected=Math.min(state.selected,panelPolygons(state.layout).length-1);
   document.querySelectorAll('[data-layout]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
@@ -60,11 +79,17 @@ $('panel-tabs').addEventListener('click',e=>{
   const tab=e.target.closest('[data-panel]');
   if(tab){state.selected=Number(tab.dataset.panel);guides=true;syncPanelControls();}
 });
-document.querySelectorAll('[data-sample]').forEach(button=>button.addEventListener('click',()=>{
-  Object.assign(state.panels[state.selected],{image:sampleImages[button.dataset.sample],zoom:1,x:.5,y:.5});
+document.querySelectorAll('[data-sample]:not([data-sample="vignette"])').forEach(button=>button.addEventListener('click',()=>{
+  const sample=button.dataset.sample;
+  Object.assign(state.panels[state.selected],{image:sampleImages[sample],zoom:cropPresets[sample][state.selected]?.zoom||1,x:cropPresets[sample][state.selected]?.x||.5,y:cropPresets[sample][state.selected]?.y||.5});
   $('status').textContent=`${button.dataset.sample==='pier'?'The pier':'Boulevard'} loaded into panel ${state.selected+1}.`;
   syncPanelControls();
 }));
+document.querySelector('[data-sample="vignette"]').addEventListener('click',()=>{
+  Object.assign(state.panels[state.selected],{image:null,vignetteIndex:state.selected});
+  $('status').textContent=`Vector vignette selected for panel ${state.selected+1}.`;
+  syncPanelControls();
+});
 
 async function importFiles(files) {
   let loaded=0;
@@ -74,7 +99,10 @@ async function importFiles(files) {
         const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);
       });
       const image=await decodePhoto(source);
-      Object.assign(state.panels[(state.selected+loaded)%panelPolygons(state.layout).length],{image,zoom:1,x:.5,y:.5});
+      const slots=state.layout==='collage'?[2,0,1]:panelPolygons(state.layout).map((_,i)=>i);
+      const start=Math.max(0,slots.indexOf(state.selected));
+      const index=slots[(start+loaded)%slots.length];
+      Object.assign(state.panels[index],{image,vignetteIndex:index,zoom:1,x:.5,y:.5});
       loaded++;
     } catch(error) {$('status').textContent=error.message || 'Could not read that photo.';}
   }
@@ -85,7 +113,7 @@ $('photo').addEventListener('change',e=>{importFiles(e.target.files);e.target.va
 document.querySelector('.upload').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('photo').click();}});
 canvas.addEventListener('dragover',e=>e.preventDefault());
 canvas.addEventListener('drop',e=>{e.preventDefault();importFiles(e.dataTransfer.files);});
-$('fill-all').addEventListener('click',()=>{const image=state.panels[state.selected].image;state.panels.forEach(p=>Object.assign(p,{image,zoom:1,x:.5,y:.5}));syncPanelControls();});
+$('fill-all').addEventListener('click',()=>{const image=state.panels[state.selected].image;state.panels.forEach((p,i)=>Object.assign(p,{image,vignetteIndex:i,zoom:1,x:.5,y:.5}));syncPanelControls();});
 $('reset-crop').addEventListener('click',()=>{Object.assign(state.panels[state.selected],{zoom:1,x:.5,y:.5});syncPanelControls();});
 for(const key of ['zoom','strength','ink']) $(key).addEventListener('input',e=>{state.panels[state.selected][key]=Number(e.target.value);syncPanelControls();});
 document.querySelectorAll('[data-grade]').forEach(b=>b.addEventListener('click',()=>{state.panels[state.selected].grade=b.dataset.grade;syncPanelControls();}));
@@ -108,7 +136,9 @@ function pointInPolygon(x,y,polygon) {
 }
 function hitPanel(event) {
   const r=canvas.getBoundingClientRect();
-  return panelPolygons(state.layout).findIndex(p=>pointInPolygon((event.clientX-r.left)/r.width,(event.clientY-r.top)/r.height,p));
+  const polygons=panelPolygons(state.layout);
+  for(let i=polygons.length-1;i>=0;i--)if(pointInPolygon((event.clientX-r.left)/r.width,(event.clientY-r.top)/r.height,polygons[i]))return i;
+  return -1;
 }
 canvas.addEventListener('pointerdown',e=>{
   const index=hitPanel(e);if(index<0)return;
@@ -145,15 +175,28 @@ async function startStudio() {
     const requested=(query.get('photo')||'boulevard').replace(/^.*\//,'').replace(/\.jpg$/,'');
     const primary=sampleImages[requested]||sampleImages.boulevard;
     state.panels.forEach((p,i)=>{
-      p.image=i===1?sampleImages.pier:primary;
-      p.zoom=[1.45,1.05,1,1.12][i];p.x=[.12,.55,.54,0][i];p.y=[.72,0,0,.94][i];
-      p.grade=i===1?'ocean':'sunset';p.strength=i===1?40:60;
+      p.image=i===2?primary:i===1?(primary===sampleImages.pier?sampleImages.boulevard:sampleImages.pier):null;p.vignetteIndex=0;
+      p.zoom=1;p.x=.5;p.y=0;p.grade='sunset';p.strength=88;p.ink=30;
     });
+    if(['hero','triptych','grid'].includes(query.get('layout'))){
+      state.layout=query.get('layout');
+      [state.panels[0],state.panels[2]]=[state.panels[2],state.panels[0]];
+      document.querySelectorAll('[data-layout]').forEach(b=>{b.classList.toggle('active',b.dataset.layout===state.layout);b.setAttribute('aria-pressed',String(b.dataset.layout===state.layout));});
+    }
+    if(state.layout==='hero')state.panels[1].y=0;
+    if(state.layout==='triptych'){state.typeY=84;state.typeSize=92;}
+    if(query.has('typeY'))state.typeY=Math.max(20,Math.min(88,Number(query.get('typeY'))||82));
+    $('type-y').value=state.typeY;
+    $('type-size').value=state.typeSize;
+    state.selected=2;
     if(query.has('caption'))state.caption=query.get('caption').replace(/\\n/g,'\n');
     $('caption').value=state.caption;
     if(query.get('shot')==='cover')document.body.classList.add('shot-cover');
     if(['1080x1080','1080x1350','1920x1080'].includes(query.get('size')))chooseSize(query.get('size'));
-    syncPanelControls();document.documentElement.dataset.ready='true';
+    syncPanelControls();
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    syncPanelControls();
+    document.documentElement.dataset.ready='true';
   } catch(error){$('status').textContent=error.message;document.documentElement.dataset.ready='error';}
 }
 startStudio();

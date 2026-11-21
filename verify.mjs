@@ -23,14 +23,23 @@ try {
   const exportBounds=await page.locator('#export').boundingBox();
   assert.ok(exportBounds.y+exportBounds.height<=1100,'Export should be visible without scrolling the desktop editor');
   const baseline=await png();
+  await page.locator('[data-panel="0"]').click();
+  const vectorBaseline=await png();
+  await page.locator('[data-sample="vignette"]').click();
+  assert.equal(await png(),vectorBaseline,'Unassigned supporting panel must already be a vector vignette');
+  await page.locator('[data-sample="pier"]').click();
+  assert.notEqual(await png(),vectorBaseline,'Explicit photo assignment must replace the vignette');
+  await page.locator('[data-sample="vignette"]').click();
+  assert.equal(await png(),vectorBaseline,'Restoring a vignette must restore identical pixels');
   assert.equal(baseline,await png(),'Repeated canvas encodes must match');
   for(const layout of ['hero','triptych','grid','collage']) {
     await page.locator(`[data-layout="${layout}"]`).click();
     assert.equal(await page.locator('[data-panel]').count(),['hero','triptych'].includes(layout)?3:4);
   }
   await page.locator('[data-panel="2"]').click();
-  await page.locator('[data-grade="neon"]').click();
-  assert.notEqual(await png(),baseline,'Changing grade should alter the cover');
+  const beforeGrade=await png();
+  await page.locator('[data-grade="ocean"]').click();
+  assert.notEqual(await png(),beforeGrade,'Changing grade should alter the cover');
   await page.locator('[data-sample="pier"]').click();
   const beforeCrop=await png();
   await page.locator('#zoom').fill('1.8');

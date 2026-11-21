@@ -18,3 +18,4 @@ const dossier = buildDossier(destination, {
   app_path_max_bytes: 1000,
 });
 writeFileSync(join(destination, 'dossier.json'), dossier);
+console.log(`Dossier written: ${Buffer.byteLength(dossier)} bytes`);

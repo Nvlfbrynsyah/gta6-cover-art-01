@@ -45,7 +45,8 @@ try {
       return route.abort();
     });
     await page.goto(`${origin}/${shot.query.replace(/^\//, '')}`, { waitUntil: 'networkidle' });
-    await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
+    await page.waitForFunction(() => ['true','error'].includes(document.documentElement.dataset.ready), null, {timeout:20000});
+    assert.equal(await page.evaluate(()=>document.documentElement.dataset.ready),'true',`${shot.name}: cover renderer failed to initialise`);
     await page.evaluate(async () => {
       await document.fonts.ready;
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -56,7 +57,7 @@ try {
       for (let i = 0; i < data.length; i += 400) colors.add(`${data[i]},${data[i+1]},${data[i+2]}`);
       return colors.size;
     });
-    assert.ok(pixels > 100, `${shot.name}: canvas is blank or lacks photo detail`);
+    assert.ok(pixels > 100, `${shot.name}: canvas is blank or lacks illustrated detail`);
     if (shot.query.includes('shot=cover')) {
       const expected = new URLSearchParams(shot.query).get('size').split('x').map(Number);
       assert.deepEqual(await page.locator('#cover').evaluate(c => [c.width, c.height]), expected);
